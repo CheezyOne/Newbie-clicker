@@ -18,8 +18,17 @@ public class AchievmentsPopUp : MonoBehaviour
     {
         GameObject NewAchievment = Instantiate(_achievmentPrefab, gameObject.transform);
         Destroy(NewAchievment, 4f);
-        NewAchievment.transform.localScale = new Vector3 (0.5f, 0.5f, 0.5f);
-        NewAchievment.transform.GetChild(1).GetComponent<Image>().sprite = Image;
+        if ((float)Screen.width / (float)Screen.height > 1.61)
+        {
+            Debug.Log("16:9");
+            NewAchievment.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        }
+        else
+        {
+            Debug.Log("16:10");
+            NewAchievment.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+        }
+            NewAchievment.transform.GetChild(1).GetComponent<Image>().sprite = Image;
         NewAchievment.transform.GetChild(2).GetComponent<Text>().text = Text;
         NewAchievment.transform.GetChild(3).GetComponent<Text>().text = Name;
         Sequence sequence = DOTween.Sequence();

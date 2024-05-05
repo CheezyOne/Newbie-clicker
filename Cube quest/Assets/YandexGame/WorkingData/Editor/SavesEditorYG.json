@@ -28,24 +28,24 @@
         24999999488.0,
         89999998976.0,
         5000.0,
-        8000.0
+        283616684624075300000.0
     ],
     "TickMoney": 0.0,
     "ClickMultiplier": 1.0,
-    "Money": 999999984306749500.0,
-    "XPMultiplyer": 1.0,
-    "CurrentXP": 0.0,
+    "Money": 3697043526966575000.0,
+    "XPMultiplyer": 10.0,
+    "CurrentXP": 10.0,
     "Achievments": [
         false,
-        false,
+        true,
         false,
         false,
         false,
         true,
         false,
-        false
+        true
     ],
-    "BoostersAmount": 1,
+    "BoostersAmount": 3,
     "CurrentDice": 0,
-    "CurrentLevel": 0
+    "CurrentLevel": 4
 }

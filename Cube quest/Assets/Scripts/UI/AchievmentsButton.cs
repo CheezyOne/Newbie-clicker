@@ -7,7 +7,6 @@ public class AchievmentsButton : MonoBehaviour
     public static Action onAchievmentsOpen, onAchievmentsClose;
     public void ChangeCameraToAchievments()
     {
-        DayNightCycle.StopTheSun = true;
         _mainCamera.SetActive(false);
         _mainCanvas.SetActive(false);
         _achievmentCanvas.SetActive(true);
@@ -16,7 +15,6 @@ public class AchievmentsButton : MonoBehaviour
     }
     public void ChangeCameraToMain()
     {
-        DayNightCycle.StopTheSun = false;
         _mainCamera.SetActive(true);
         _mainCanvas.SetActive(true);
         _achievmentCanvas.SetActive(false);
