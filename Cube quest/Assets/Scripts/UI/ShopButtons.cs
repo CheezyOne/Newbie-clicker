@@ -9,6 +9,7 @@ public class ShopButtons : MonoBehaviour
     [SerializeField] private int _buttonIndex;//For saving price data
     [SerializeField] private float _increaseFloat;
     [SerializeField] private float _price;
+    [SerializeField] private float _rememberPrice;
     [SerializeField] private MoneyManager _moneyManager;
     [SerializeField] private Sprite _unblockedButtonSprite, _blockedButtonSprite;
     private Button _buttonComponent;
@@ -39,26 +40,21 @@ public class ShopButtons : MonoBehaviour
         if(!_isCubeUpgrade)
             _imageAndDescription = transform.GetChild(0).gameObject;
     }
-
     private void Update()
     {
         TryToUnlockButton();
-        SaveData();
     }
     private void Start()
     {
-        YandexGame.ResetSaveProgress();
-        YandexGame.SaveProgress();
         if(YandexGame.savesData.AllPrices[_buttonIndex]>0)
             _price = YandexGame.savesData.AllPrices[_buttonIndex];
-
+        _upgradeCounter = YandexGame.savesData.UpgradesCounter;
         _priceText.text = ShortScaleString.parseFloat(_price, 0, 1000, true);
         if (_isCubeUpgrade)
         {
             _cubeIndex = YandexGame.savesData.CurrentDice;
             SetRollingDice();
         }
-        
     }
     private void TryToUnlockButton()
     {
@@ -95,6 +91,7 @@ public class ShopButtons : MonoBehaviour
             onTickBuy?.Invoke(_increaseFloat, "Tick");
             _price *= 1.1f;
             _priceText.text = ShortScaleString.parseFloat(_price, 0, 1000, true);
+            SaveData();
         }
     }
     public void ClickButton()
@@ -105,6 +102,7 @@ public class ShopButtons : MonoBehaviour
             onClickBuy?.Invoke(_increaseFloat, "Click");
             _price *= 1.1f;
             _priceText.text = ShortScaleString.parseFloat(_price, 0, 1000, true);
+            SaveData();
         }
     }
     public void UpgradeCubeFunc()
@@ -113,12 +111,12 @@ public class ShopButtons : MonoBehaviour
         { 
             _cubeIndex++;
             YandexGame.savesData.CurrentDice = _cubeIndex;
-            Debug.Log(YandexGame.savesData.CurrentDice);
             onCubeUpgrade?.Invoke();
             onDecreaseMoney?.Invoke(_price);
             _price *= 130f;
             _priceText.text = ShortScaleString.parseFloat(_price, 1, 10000, true).ToString();
             SetRollingDice();
+            SaveData();
         }
     }
     private void SetRollingDice()
@@ -138,6 +136,7 @@ public class ShopButtons : MonoBehaviour
             onXPUpgrade?.Invoke();
             _price *= 69f;
             _priceText.text = ShortScaleString.parseFloat(_price, 1, 10000, true).ToString();
+            SaveData();
         }
     }
     public void InreaseUpgradeCounter()
@@ -145,5 +144,23 @@ public class ShopButtons : MonoBehaviour
         _upgradeCounter++;
         if(_upgradeCounter>=200)
             onAchievmentGet?.Invoke(7);
+    }
+    public void ResetButtons()
+    {
+        _price = _rememberPrice;
+        YandexGame.savesData.AllPrices[_buttonIndex] = _price;
+        _upgradeCounter = 0;
+        _priceText.text = ShortScaleString.parseFloat(_price, 1, 999, true).ToString();
+        _imageComponent.sprite = _blockedButtonSprite;
+        if (_buttonIndex<16)
+                _imageAndDescription.SetActive(false);
+        _buttonComponent.interactable = false;
+        if(_isCubeUpgrade)
+        {
+            _cubeIndex = 0;
+            YandexGame.savesData.CurrentDice = _cubeIndex;
+            _priceText.text = ShortScaleString.parseFloat(_price, 1, 10000, true).ToString();
+            SetRollingDice();
+        }
     }
 }

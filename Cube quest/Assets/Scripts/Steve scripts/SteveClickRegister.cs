@@ -6,12 +6,11 @@ public class SteveClickRegister : MonoBehaviour
 {
     [SerializeField] private Camera _mainCamera;
     private int _clickCounterForAchievment=0;
-    private bool _gotAchievment;
 
     public static Action<int> onAchievmentGet;
     public static Action onSteveClick;
 
-    private const int _clicksNeedForAchievment=9;
+    private const int _clicksNeedForAchievment=8;
     private const float _achievmentTime = 1f;
     private void Update()
     {
@@ -24,10 +23,9 @@ public class SteveClickRegister : MonoBehaviour
     }
     private IEnumerator AchievmentClickTimer()
     {
-        if (_clickCounterForAchievment > _clicksNeedForAchievment && !_gotAchievment)
+        if (_clickCounterForAchievment > _clicksNeedForAchievment)
         {
             onAchievmentGet?.Invoke(3);
-            _gotAchievment = true;
         }
         yield return new WaitForSeconds(_achievmentTime);
         _clickCounterForAchievment--;
@@ -40,11 +38,8 @@ public class SteveClickRegister : MonoBehaviour
         {
             if(hit.transform.GetComponent<SteveHolder>()!=null)
             {
-                if (!_gotAchievment)
-                {
                     _clickCounterForAchievment++;
-                    StartCoroutine(AchievmentClickTimer());
-                }
+                StartCoroutine(AchievmentClickTimer());
                 onSteveClick?.Invoke();
             }
         }

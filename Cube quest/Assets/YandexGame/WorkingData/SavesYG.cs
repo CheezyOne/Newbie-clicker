@@ -20,7 +20,7 @@ namespace YG
         public float[] AllPrices = new float[18];
         public float TickMoney = 0, ClickMultiplier = 1, Money = 0, XPMultiplyer = 1, CurrentXP =0;
         public bool[] Achievments = new bool[8];
-        public int BoostersAmount = 0, CurrentDice = 0, CurrentLevel = 0;
+        public int BoostersAmount = 0, CurrentDice = 0, CurrentLevel = 0, UpgradesCounter=0;
         // Ваши сохранения
 
         // ...

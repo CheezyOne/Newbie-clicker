@@ -6,6 +6,7 @@ using DG.Tweening;
 public class AchievmentsPopUp : MonoBehaviour
 {
     [SerializeField] private GameObject _achievmentPrefab;
+    [SerializeField] private Transform _moveToPosition;
     private void OnEnable()
     {
         AchievmentsGetter.onNewAchievmentGet += PopUp;
@@ -20,19 +21,21 @@ public class AchievmentsPopUp : MonoBehaviour
         Destroy(NewAchievment, 4f);
         if ((float)Screen.width / (float)Screen.height > 1.61)
         {
-            Debug.Log("16:9");
             NewAchievment.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         }
-        else
+        else if ((float)Screen.width / (float)Screen.height > 1.51)
         {
-            Debug.Log("16:10");
             NewAchievment.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
         }
-            NewAchievment.transform.GetChild(1).GetComponent<Image>().sprite = Image;
+        else 
+        {
+            NewAchievment.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+        }
+        NewAchievment.transform.GetChild(1).GetComponent<Image>().sprite = Image;
         NewAchievment.transform.GetChild(2).GetComponent<Text>().text = Text;
         NewAchievment.transform.GetChild(3).GetComponent<Text>().text = Name;
         Sequence sequence = DOTween.Sequence();
-        sequence.Append(NewAchievment.transform.DOMoveY(transform.position.y + 1.2f, 0.5f));
+        sequence.Append(NewAchievment.transform.DOMove(_moveToPosition.position, 0.5f));
         sequence.Append(NewAchievment.transform.DOMoveY(transform.position.y-10, 0.5f).SetDelay(2f));
     }
 }

@@ -15,7 +15,7 @@ public class SteveHolder : MonoBehaviour
     private bool _isEnglish = true;
     private void Start()
     {
-        if (YandexGame.lang == "ru" || Application.systemLanguage == SystemLanguage.Russian)
+        if (YandexGame.lang == "ru")
             _isEnglish = false;
         ChangeSteve(YandexGame.savesData.CurrentLevel);
     }
@@ -23,11 +23,13 @@ public class SteveHolder : MonoBehaviour
     {
         SteveClickRegister.onSteveClick += WasClicked;
         SteveUpgrade.onSteveUpgrade += ChangeSteve;
+        SteveUpgrade.onSteveReset += ChangeSteve;
     }
     private void OnDisable()
     {
         SteveClickRegister.onSteveClick -= WasClicked;
         SteveUpgrade.onSteveUpgrade -= ChangeSteve;
+        SteveUpgrade.onSteveReset -= ChangeSteve;
     }
     private void GetHypingSteveRandomly()
     {

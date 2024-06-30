@@ -1,4 +1,5 @@
 using UnityEngine;
+using YG;
 
 public class DiceSpawner : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class DiceSpawner : MonoBehaviour
         SteveHolder.onSteveClick += RollDice;
         ShopButtons.onClickBuy += RollBlueDice;
         ShopButtons.onTickBuy += RollBlueDice;
+        ResetProgress.Reset += ResetDice;
     }
     private void OnDisable()
     {
@@ -23,10 +25,12 @@ public class DiceSpawner : MonoBehaviour
         SteveHolder.onSteveClick -= RollDice;
         ShopButtons.onClickBuy -= RollBlueDice;
         ShopButtons.onTickBuy -= RollBlueDice;
+        ResetProgress.Reset -= ResetDice;
     }
     private void Awake()
     {
-        _dicePrefab = _dicePrefabs[0];
+        _dicePrefab = _dicePrefabs[YandexGame.savesData.CurrentDice];
+        _diceCounter = YandexGame.savesData.CurrentDice;
     }
     private void UpgradeCube()
     {
@@ -86,5 +90,11 @@ public class DiceSpawner : MonoBehaviour
         NewCube.GetComponent<Rigidbody>().AddForce(RandomVector);
         NewCube.transform.SetPositionAndRotation(transform.position, UnityEngine.Random.rotation);
         NewCube.GetComponent<Dice>().Target = _diceTarget;
+    }
+    private void ResetDice()
+    {
+        YandexGame.savesData.CurrentDice =0;
+        _diceCounter = 0;
+        _dicePrefab = _dicePrefabs[0];
     }
 }

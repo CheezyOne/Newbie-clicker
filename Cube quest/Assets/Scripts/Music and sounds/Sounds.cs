@@ -3,10 +3,11 @@ using UnityEngine;
 public class Sounds : MonoBehaviour
 {
     [SerializeField] private AudioClip[] _allSounds;
-    private AudioSource _audioSource => GetComponent<AudioSource>();
+    private AudioSource _audioSource;
 
     private void OnEnable()
     {
+        _audioSource= GetComponent<AudioSource>();
         Dice.onDiceStop += PlayDiceDisappearence;
         ShopButtons.onDecreaseMoney += PlayBuyUpgrade;
         SteveHolder.onSteveClick += PlayClick;
@@ -42,7 +43,7 @@ public class Sounds : MonoBehaviour
     {
         PlaySound(_allSounds[5], 0.9f, 1,1);
     }
-    private void PlaySound(AudioClip Clip, float Volume = 1f, float Pitch1 = 0.95f, float Pitch2 = 1.05f, float Delay = 0)
+    private void PlaySound(AudioClip Clip, float Volume = 1f, float Pitch1 = 1f, float Pitch2 = 1f, float Delay = 0)
     {
         _audioSource.clip = Clip;
         _audioSource.volume = Volume;

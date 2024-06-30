@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Unity.VisualScripting;
@@ -13,6 +14,8 @@ public class AchievmentsGetter : MonoBehaviour
     [SerializeField] private Transform _achievmentsHolder;
     [SerializeField] private Sprite[] _achievmentImages;
     [SerializeField] private List<bool> _hasAchievment = new();
+    [SerializeField] private Sprite _lockedAchievementImage;
+
     private Text[] _lockedAchievmentNames = new Text[8], _allAchievmentNames = new Text[8];
     private string[] _achievmentNamesString = new string[8];
     public static Action<string, string, Sprite> onNewAchievmentGet;
@@ -28,6 +31,7 @@ public class AchievmentsGetter : MonoBehaviour
         BoostersButtons.onAchievmentGet += RevealNewAchievment;
         AchievmentsButton.onAchievmentsOpen += OpenAchievments;
         AchievmentsButton.onAchievmentsClose += HideAchievments;
+        ResetProgress.Reset += ResetAchievements;
     }
     private void OnDisable()
     {
@@ -41,8 +45,14 @@ public class AchievmentsGetter : MonoBehaviour
         BoostersButtons.onAchievmentGet -= RevealNewAchievment;
         AchievmentsButton.onAchievmentsOpen -= OpenAchievments;
         AchievmentsButton.onAchievmentsClose -= HideAchievments;
+        ResetProgress.Reset -= ResetAchievements;
     }
     private void Start()
+    {
+        GetAchivementsObjects();
+        StartCoroutine(WaitForLanguageChange());
+    }
+    private void GetAchivementsObjects()
     {
         for (int i = 0; i < _achievmentsHolder.childCount; i++)
         {
@@ -51,7 +61,10 @@ public class AchievmentsGetter : MonoBehaviour
             _achievmentNamesString[i] = _allAchievmentNames[i].text;
             _allAchievmentNames[i].text = _achievmentNamesString[i];
         }
-        for (int i =0; i< _hasAchievment.Count; i++)
+    }
+    private void GetStartingNames()
+    {
+        for (int i = 0; i < _hasAchievment.Count; i++)
         {
             if (YandexGame.savesData.Achievments[i])
             {
@@ -61,6 +74,11 @@ public class AchievmentsGetter : MonoBehaviour
                 _achievmentsHolder.GetChild(i).GetChild(1).GetComponent<Image>().sprite = _achievmentImages[i];
             }
         }
+    }
+    private IEnumerator WaitForLanguageChange()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GetStartingNames();
     }
     private void OpenAchievments()
     {
@@ -91,7 +109,19 @@ public class AchievmentsGetter : MonoBehaviour
         _lockedAchievmentNames[Index].DOKill();
         _lockedAchievmentNames[Index] = null;
         _allAchievmentNames[Index].text = _achievmentNamesString[Index];
-        Achievment.GetChild(1).GetComponent<Image>().sprite= _achievmentImages[Index];
+        Achievment.GetChild(1).GetComponent<Image>().sprite = _achievmentImages[Index];
         onNewAchievmentGet?.Invoke(Achievment.GetChild(2).GetComponent<Text>().text, Achievment.GetChild(3).GetComponent<Text>().text, _achievmentImages[Index]);
+    }
+    private void ResetAchievements()
+    {
+        for (int i = 0; i < _hasAchievment.Count; i++)
+        {
+            _hasAchievment[i] = false;
+            Transform Achievment = _achievmentsHolder.GetChild(i);
+            Achievment.GetChild(1).GetComponent<Image>().sprite = _lockedAchievementImage;
+            YandexGame.savesData.Achievments[i] = false;
+            _lockedAchievmentNames[i] = _allAchievmentNames[i];
+            _lockedAchievmentNames[i].DOText("Пасхалка", _infiniteTimeDoText, true, ScrambleMode.Lowercase);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ public class MoneyManager : MonoBehaviour
     [SerializeField] private Transform _textSpawnPosition, _clickCanvas, _blueTextSpawnPosition;
     [SerializeField] private GameObject _clickText;
     private float _moneyClickMultiplier = 1, _moneyPerTick=0;
-    private bool _hasAchiemvent, _clickMoneyIsDoubled, _tickMoneyIsDoubled;
+    private bool _clickMoneyIsDoubled, _tickMoneyIsDoubled, _startUpdatingMoney;
     private const float _theRichestManMoney = 160000000000;
     private void OnEnable()
     {
@@ -21,6 +22,7 @@ public class MoneyManager : MonoBehaviour
         ShopButtons.onDecreaseMoney += SpendMoney;
         DiceTargetManager.onClickIncrease += IncreaseClickMoney;
         DiceTargetManager.onTickIncrease += IncreaseTickMoney;
+        ResetProgress.Reset += MoneyReset;
     }
     private void OnDisable()
     {
@@ -29,10 +31,10 @@ public class MoneyManager : MonoBehaviour
         ShopButtons.onDecreaseMoney -= SpendMoney;
         DiceTargetManager.onClickIncrease -= IncreaseClickMoney;
         DiceTargetManager.onTickIncrease -= IncreaseTickMoney;
+        ResetProgress.Reset -= MoneyReset;
     }
     private void Start()
     {
-        
         MoneyAmount = YandexGame.savesData.Money;
         _moneyPerTick = YandexGame.savesData.TickMoney;
         if (YandexGame.savesData.ClickMultiplier > 0)
@@ -40,10 +42,20 @@ public class MoneyManager : MonoBehaviour
         else
             _moneyClickMultiplier = 1;
         UpdateTickMoneyText();
-        
+        StartCoroutine(RichestManAchivementFix());
+        YandexGame.SaveProgress(); 
+    }
+    private IEnumerator RichestManAchivementFix()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        _startUpdatingMoney = true;
     }
     private void Update()
     {
+        if (!_startUpdatingMoney)
+            return;
         MoneyAmount += Time.deltaTime * _moneyPerTick;
         OnMoneyChange();
         SaveDataYandex();
@@ -118,13 +130,9 @@ public class MoneyManager : MonoBehaviour
     }
     private void OnMoneyChange()
     {
-        if(!_hasAchiemvent)
+        if (MoneyAmount > _theRichestManMoney)
         {
-            if(MoneyAmount> _theRichestManMoney)
-            {
-                _hasAchiemvent = true;
-                onAchievmentGet?.Invoke(6);
-            }
+            onAchievmentGet?.Invoke(6);
         }
         if(MoneyAmount < 10000)
             _moneyText.text = Math.Round(MoneyAmount).ToString();
@@ -142,5 +150,16 @@ public class MoneyManager : MonoBehaviour
         YandexGame.savesData.Money = MoneyAmount ;
         YandexGame.savesData.TickMoney = _moneyPerTick;
         YandexGame.savesData.ClickMultiplier = _moneyClickMultiplier;
+    }
+    private void MoneyReset()
+    {
+        _moneyClickMultiplier = 1;
+        MoneyAmount = 0;
+        _moneyPerTick = 0;
+        _moneyText.text = "0";
+        _tickText.text = "0";
+        YandexGame.savesData.Money = 0;
+        YandexGame.savesData.TickMoney = 0;
+        YandexGame.savesData.ClickMultiplier = 1;
     }
 }

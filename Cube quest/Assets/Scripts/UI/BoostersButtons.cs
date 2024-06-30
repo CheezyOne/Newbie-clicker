@@ -10,15 +10,18 @@ public class BoostersButtons : MonoBehaviour
 {
     public static int BoostersAmount = 0;
     [SerializeField] private GameObject[] _boostButtons;
+    [SerializeField] private GameObject _doubleMoneyBlocker;
     [SerializeField] private MoneyManager _moneyManager;
-    [SerializeField] private TMP_Text _boostersNumber;
+    [SerializeField] private TMP_Text _boostersNumber, _doubleMoneyBlockerTimer;
     private bool _hasDoubleTick, _hasDoubleClick, _hasDoubleXP;
     public static Action onXPBoostActive, onXPBoostDeactive;
     public static Action<int> onBoostAdStart;
     public static Action<int> onAchievmentGet;
-
+    private int _doubleMoneyTimer = 0;
     private void OnEnable()
     {
+        if (_doubleMoneyTimer != 0)
+            StartCoroutine(DoubleMoneyTimer());
         YandexGame.RewardVideoEvent += StartBoost;
     }
     private void OnDisable()
@@ -33,6 +36,7 @@ public class BoostersButtons : MonoBehaviour
     }
     private void StartBoost(int BoostIndex)
     {
+        onAchievmentGet?.Invoke(5);
         switch (BoostIndex)
         {
             case 0:
@@ -113,8 +117,26 @@ public class BoostersButtons : MonoBehaviour
         onXPBoostActive?.Invoke();
         _hasDoubleXP = true;
     }
+    private IEnumerator DoubleMoneyTimer()
+    {
+        _doubleMoneyTimer = Convert.ToInt32(_doubleMoneyBlockerTimer.text);
+        if (_doubleMoneyTimer == 0)
+        {
+            _boostButtons[3].GetComponent<Button>().enabled = true;
+            _doubleMoneyBlocker.SetActive(false);
+            _doubleMoneyBlockerTimer.text = "30";
+            yield break;
+        }
+        yield return new WaitForSeconds(1);
+        _doubleMoneyTimer--;
+        _doubleMoneyBlockerTimer.text = Convert.ToString(_doubleMoneyTimer);
+        yield return DoubleMoneyTimer();
+    }
     private void DoubleTheMoney()
     {
+        _doubleMoneyBlocker.SetActive(true);
+        _boostButtons[3].GetComponent<Button>().enabled = false;
+        StartCoroutine(DoubleMoneyTimer());
         _moneyManager.MoneyAmount *= 2;
     }
     private void AchievmentGet()
@@ -158,5 +180,10 @@ public class BoostersButtons : MonoBehaviour
             onXPBoostDeactive?.Invoke();
             return;
         }
+    }
+    public void ResetBoosters()
+    {
+        BoostersAmount = 0;
+        YandexGame.savesData.BoostersAmount = 0;
     }
 }

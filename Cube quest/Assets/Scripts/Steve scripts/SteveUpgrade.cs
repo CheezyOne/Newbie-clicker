@@ -5,8 +5,8 @@ using YG;
 
 public class SteveUpgrade : MonoBehaviour
 {
-    public static Action<int> onSteveUpgrade;
-    public static Action<int> onAchievmentGet;
+    public static Action<int> onSteveUpgrade, onAchievmentGet, onSteveReset;
+
     [SerializeField] private Image _xpBar;
     [SerializeField] private float[] _xpForEachLevel;
     private float _currentXp, _xpMultiplier=1;
@@ -31,8 +31,12 @@ public class SteveUpgrade : MonoBehaviour
             _xpMultiplier = YandexGame.savesData.XPMultiplyer;
         else
             _xpMultiplier = 1;
-        _currentXp = YandexGame.savesData.CurrentXP;
         _level = YandexGame.savesData.CurrentLevel;
+        _currentXp = YandexGame.savesData.CurrentXP;
+        if (_level == _xpForEachLevel.Length-1)
+            _xpBar.fillAmount = 100f;
+        else
+            _xpBar.fillAmount = _currentXp / _xpForEachLevel[_level];
     }
     private void HalfXP()
     {
@@ -67,5 +71,16 @@ public class SteveUpgrade : MonoBehaviour
             }
             _currentXp = 0;
         }
+    }
+    public void ResetLevel()
+    {
+        _currentXp = 0;
+        _xpMultiplier = 1;
+        _level = 0;
+        YandexGame.savesData.XPMultiplyer = 1;
+        YandexGame.savesData.CurrentLevel = 0;
+        YandexGame.savesData.CurrentXP = 0;
+        onSteveReset?.Invoke(0);
+        _xpBar.fillAmount = 0;
     }
 }
